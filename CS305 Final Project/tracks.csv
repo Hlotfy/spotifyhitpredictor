@@ -1,0 +1,2 @@
+artist_ids,track_href,artist_popularity,analysis_url,energy,liveness,tempo,speechiness,uri,acousticness,instrumentalness,time_signature,danceability,key,year,duration_ms,loudness,valence,type,id,mode
+2wY79sveU1sp5g7SokKOiI,https://api.spotify.com/v1/tracks/0mel2N9Ws9r4yLQn5QE21Y,92,https://api.spotify.com/v1/audio-analysis/0mel2N9Ws9r4yLQn5QE21Y,0.378,0.177,91.835,0.0533,spotify:track:0mel2N9Ws9r4yLQn5QE21Y,0.658,0,4,0.653,5,2017,201000,-8.273,0.54,audio_features,0mel2N9Ws9r4yLQn5QE21Y,1
