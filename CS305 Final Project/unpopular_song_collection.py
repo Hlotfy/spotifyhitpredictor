@@ -27,38 +27,39 @@ def get_pop_track_ids(filename):
     track_ids = [link.split('/')[-1] for link in track_links]
     return track_ids
 
-files_17 = os.listdir('2017/')
+# files_17 = os.listdir('2017/')
 
-data = []
+# data = []
 all_ids = set()
-for file in files_17:
-    if not file.startswith('.'):
-        ids = get_pop_track_ids('2017/'+file)
-        all_ids.update(ids)
+# for file in files_17:
+#     if not file.startswith('.'):
+#         ids = get_pop_track_ids('2017/'+file)
+#         all_ids.update(ids)
 
-d_2016 = pd.read_csv('2016_data.csv', skiprows=0, header=0)
-d_2016 = d_2016[['id', 'acousticness', 'danceability', 'duration_ms', 'energy', 'instrumentalness', 'key', 'liveness', 'loudness', 'mode', 'speechiness', 'tempo', 'time_signature', 'valence', 'track_popularity', 'artist_popularity', 'year', 'hit']]
-d_2016.to_csv('2016_data.csv', index=False)
-
-d_2019 = pd.read_csv('2019_data.csv', skiprows=0, header=0)
-d_2019 = d_2019[['id', 'acousticness', 'danceability', 'duration_ms', 'energy', 'instrumentalness', 'key', 'liveness', 'loudness', 'mode', 'speechiness', 'tempo', 'time_signature', 'valence', 'track_popularity', 'artist_popularity', 'year', 'hit']]
-d_2019.to_csv('2019_data.csv', index=False)
-print(len(all_ids))
-all_ids.update(d_2016['id'])
-all_ids.update(d_2019['id'])
+track_data = pd.read_csv('/Users/hlotfy/spotifyhitpredictor/CS305 Final Project/clean_data/tracks.csv', skiprows=0, header=0)
+all_ids.update(track_data['id'])
+# d_2016 = d_2016[['id', 'acousticness', 'danceability', 'duration_ms', 'energy', 'instrumentalness', 'key', 'liveness', 'loudness', 'mode', 'speechiness', 'tempo', 'time_signature', 'valence', 'track_popularity', 'artist_popularity', 'year', 'hit']]
+# # d_2016.to_csv('2016_data.csv', index=False)
+# 
+# d_2019 = pd.read_csv('clean_data/2019_data.csv', skiprows=0, header=0)
+# # d_2019 = d_2019[['id', 'acousticness', 'danceability', 'duration_ms', 'energy', 'instrumentalness', 'key', 'liveness', 'loudness', 'mode', 'speechiness', 'tempo', 'time_signature', 'valence', 'track_popularity', 'artist_popularity', 'year', 'hit']]
+# # d_2019.to_csv('2019_data.csv', index=False)
+# # print(len(all_ids))
+# all_ids.update(d_2016['id'])
+# all_ids.update(d_2019['id'])
 print(len(all_ids))
 
 
 #only keep the songs which are from between 2016-2019
 
-nh = os.listdir('nonhits/')
+nh = os.listdir('/Users/hlotfy/spotifyhitpredictor/CS305 Final Project/nonhits/')
 
 data = []
 hp_all_ids = set()
 for file in nh:
     if not file.startswith('.'):
         # print(file)
-        ids = get_track_ids('nonhits/'+file)
+        ids = get_track_ids('/Users/hlotfy/spotifyhitpredictor/CS305 Final Project/nonhits/'+file)
         hp_all_ids.update(ids)
 # print(hp_all_ids)
 print(len(hp_all_ids))
@@ -85,7 +86,7 @@ for i in range(len(no_hits)//50 + 1):
     # print(track_info)
     for i in range(len(features1)):
     	if features1[i]:
-    		track_info['tracks'][i]['year'] = track_info['tracks'][i]['album']['release_date'].split('-')[0]
+    		track_info['tracks'][i]['year'] = int(track_info['tracks'][i]['album']['release_date'].split('-')[0])
     		track_info['tracks'][i].pop('album')
     		# track_info['tracks'][i].pop('release_date_precision')
 	    	features1[i].update(track_info['tracks'][i])
@@ -131,14 +132,19 @@ arr_data = np.asarray(data)
 flattener = lambda t: flatten_dict(t)
 vfunc = np.vectorize(flattener)
 
-data = vfunc(arr_data[arr_data!=None])
-# data = [flatten_dict(d) for d in data if d]
-
-no_hits_df = pd.DataFrame(data).drop(columns=['available_markets', 'analysis_url', 'uri', 'type', 'track_number', 'disc_number', 'spotify', 'href', 'track_href','preview_url','explicit','is_local','isrc','name'])
+# data = vfunc(arr_data[arr_data!=None])
+data = [flatten_dict(d) for d in data if d]
+print(data)
+no_hits_df = pd.DataFrame(data).drop(['available_markets', 'analysis_url', 'uri', 'type', 'track_number', 'disc_number', 'spotify', 'href', 'track_href','preview_url','explicit','is_local','isrc','name'],axis=1)
+print(no_hits_df)
 no_hits_df['hit'] = 0
-feat = list(no_hits_df.columns)
-print(feat)
-no_hits_df.to_csv('no_hits_data.csv', encoding='utf-8-sig')
+no_hits_df.to_csv('/Users/hlotfy/spotifyhitpredictor/CS305 Final Project/no_hits_data_more.csv', encoding='utf-8-sig')
+no_hits_df = no_hits_df[no_hits_df.year > 2015]
+no_hits_df.rename({"popularity":"track_popularity"})
+no_hits_df = no_hits_df[['id', 'acousticness', 'danceability', 'duration_ms', 'energy', 'instrumentalness', 'key', 'liveness', 'loudness', 'mode', 'speechiness', 'tempo', 'time_signature', 'valence', 'track_popularity', 'artist_popularity', 'year', 'hit']]
+no_hits_df.to_csv('/Users/hlotfy/spotifyhitpredictor/CS305 Final Project/no_hits_data_more_f.csv', encoding='utf-8-sig')
 
-print(no_hits_df.head())
-
+# feat = list(no_hits_df.columns)
+# print(feat)
+# 
+# print(no_hits_df.head())
