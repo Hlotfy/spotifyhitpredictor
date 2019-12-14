@@ -12,6 +12,7 @@ token = spotifyAuth.get_access_token()
 spotify = spotipy.Spotify(auth=token)
 
 def get_track_ids(filename):
+    print(filename)
     DATA = pd.read_csv(filename, skiprows=0, header=1)
     data = np.asarray(DATA)
     track_links = list(data[:, 0])
@@ -56,6 +57,7 @@ data = []
 hp_all_ids = set()
 for file in nh:
     if not file.startswith('.'):
+        # print(file)
         ids = get_track_ids('nonhits/'+file)
         hp_all_ids.update(ids)
 # print(hp_all_ids)
@@ -68,9 +70,12 @@ no_hits = list(no_hits)
 for i in range(len(no_hits)//50 + 1):
     prev = 50*(i)
     next100 = 50*(i+1)
-    if next100 < len(no_hits)/50:
-        features1 = spotify.audio_features(no_hits[next100:])
+    if next100 < len(no_hits)/100:
+        print(no_hits[next100:])
         track_info = spotify.tracks(no_hits[next100:])
+
+        print(track_info)
+        features1 = spotify.audio_features(no_hits[next100:])
         # print(track_info)
     else:
         features1 = spotify.audio_features(no_hits[prev:next100])
@@ -126,7 +131,7 @@ arr_data = np.asarray(data)
 flattener = lambda t: flatten_dict(t)
 vfunc = np.vectorize(flattener)
 
-data = vfunc(arr_data)
+data = vfunc(arr_data[arr_data!=None])
 # data = [flatten_dict(d) for d in data if d]
 
 no_hits_df = pd.DataFrame(data).drop(columns=['available_markets', 'analysis_url', 'uri', 'type', 'track_number', 'disc_number', 'spotify', 'href', 'track_href','preview_url','explicit','is_local','isrc','name'])
